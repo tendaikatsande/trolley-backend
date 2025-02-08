@@ -1,6 +1,5 @@
 package zw.co.trolley.ProductService.services;
 
-import jakarta.persistence.Cacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

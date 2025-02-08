@@ -16,7 +16,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     private final List<String> publicPaths = List.of(
             "/api/auth/login",
             "/api/auth/register",
-            "/api/products"
+            "/api/products",
+            "/swagger-ui",
+            "/v3/api-docs"
     );
 
     @Override
