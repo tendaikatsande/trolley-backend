@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build: ./ApiGateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - product-service
+      - order-service
+      - user-service
+      - payment-service
+      - notification-service
+
+  auth-service:
+    build: ./AuthService
+    ports:
+      - "8081:8081"
+    depends_on:
+      - auth-db
+
+  product-service:
+    build: ./PaymentService
+    ports:
+      - "8082:8082"
+    depends_on:
+      - product-db
+      - redis
+
+  order-service:
+    build: ./OrderService
+    ports:
+      - "8083:8083"
+    depends_on:
+      - order-db
+      - rabbitmq
+
+  user-service:
+    build: ./PaymentService
+    ports:
+      - "8084:8084"
+    depends_on:
+      - user-db
+
+  payment-service:
+    build: ./PaymentService
+    ports:
+      - "8085:8085"
+    depends_on:
+      - payment-db
+
+  notification-service:
+    build: ./NotificationService
+    ports:
+      - "8086:8086"
+    depends_on:
+      - rabbitmq
+
+  # Databases
+  auth-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: tr_auth_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+  product-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: tr_product_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+  order-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: tr_order_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+  user-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: tr_user_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+  payment-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: tr_payment_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
