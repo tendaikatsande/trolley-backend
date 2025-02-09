@@ -1,5 +1,6 @@
 package zw.co.trolley.ProductService.services;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ public class ProductService {
         return mapToDto(product);
     }
 
+    @CircuitBreaker(name = "productService", fallbackMethod = "fallback")
     public Page<ProductDto> getAllProducts(String search, UUID categoryId, Pageable pageable) {
         Specification<Product> spec = Specification.where(null);
 
@@ -78,5 +80,9 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + id));
         productRepository.delete(product);
+    }
+
+    public String fallback(Exception e) {
+        return "Fallback response: Service unavailable";
     }
 }
