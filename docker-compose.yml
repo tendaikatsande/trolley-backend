@@ -12,6 +12,7 @@ services:
       - user-service
       - payment-service
       - notification-service
+      - discovery-service
 
   auth-service:
     build: ./AuthService
@@ -21,7 +22,7 @@ services:
       - auth-db
 
   product-service:
-    build: ./PaymentService
+    build: ./ProductService
     ports:
       - "8082:8082"
     depends_on:
@@ -37,25 +38,30 @@ services:
       - rabbitmq
 
   user-service:
-    build: ./PaymentService
+    build: ./UserService
     ports:
       - "8084:8084"
     depends_on:
       - user-db
 
-  payment-service:
-    build: ./PaymentService
-    ports:
-      - "8085:8085"
-    depends_on:
-      - payment-db
-
   notification-service:
     build: ./NotificationService
     ports:
-      - "8086:8086"
+      - "8085:8085"
     depends_on:
       - rabbitmq
+
+  payment-service:
+    build: ./PaymentService
+    ports:
+      - "8086:8086"
+    depends_on:
+      - payment-db
+
+  discovery-service:
+    build: ./DiscoveryService
+    ports:
+      - "8761:8761"
 
   # Databases
   auth-db:
