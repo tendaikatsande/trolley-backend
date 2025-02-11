@@ -24,4 +24,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @GetMapping("/profile")
+    public ResponseEntity<String> profile() {
+        return ResponseEntity.ok("Profile");
+    }
+    @GetMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    }
+
 }

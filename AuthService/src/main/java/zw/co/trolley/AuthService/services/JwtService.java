@@ -54,4 +54,28 @@ public class JwtService {
             return false;
         }
     }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            Date expiration = claims.getExpiration();
+            return expiration.after(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String extractUserId(String refreshToken) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(refreshToken)
+                .getBody();
+        return claims.getSubject();
+    }
 }

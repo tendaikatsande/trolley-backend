@@ -47,6 +47,8 @@ public class ProductService {
         productDto.setQuantity(product.getQuantity());
         productDto.setImageUrl(product.getImageUrl());
         productDto.setCategory(product.getCategory());
+        productDto.setRating(product.getRating());
+        productDto.setNumRatings(product.getNumRatings());
         return productDto;
 
     }
@@ -59,7 +61,10 @@ public class ProductService {
         product.setQuantity(productDto.getQuantity());
         product.setImageUrl(productDto.getImageUrl());
         product.setCategory(productDto.getCategory());
+        product.setRating(productDto.getRating());
+        product.setNumRatings(productDto.getNumRatings());
         Product savedProduct = productRepository.save(product);
+
         return mapToDto(savedProduct);
     }
 
@@ -72,6 +77,8 @@ public class ProductService {
         product.setQuantity(productDto.getQuantity());
         product.setImageUrl(productDto.getImageUrl());
         product.setCategory(productDto.getCategory());
+        product.setRating(productDto.getRating());
+        product.setNumRatings(productDto.getNumRatings());
         Product updatedProduct = productRepository.save(product);
         return mapToDto(updatedProduct);
     }

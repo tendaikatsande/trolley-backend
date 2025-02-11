@@ -18,7 +18,7 @@ public class GatewayConfig {
 
                 // Product Service Routes
                 .route("product-service", r -> r
-                        .path("/api/products/**")
+                        .path("/api/products/**","/api/categories")
                         .uri("http://localhost:8082"))
 
                 // Order Service Routes

@@ -13,6 +13,8 @@ import zw.co.trolley.AuthService.exceptions.InvalidCredentialsException;
 import zw.co.trolley.AuthService.exceptions.UserExistsException;
 import zw.co.trolley.AuthService.exceptions.UserNotFoundException;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -60,5 +62,26 @@ public class AuthService {
         response.setToken(token);
         response.setRefreshToken(refreshToken);
         return response;
+    }
+
+    public AuthResponse refreshToken(String refreshToken) {
+        if (!jwtService.isTokenValid(refreshToken)) {
+            throw new InvalidCredentialsException("Invalid refresh token");
+        }
+
+        String userId = jwtService.extractUserId(refreshToken);
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!user.getRefreshToken().equals(refreshToken)) {
+            throw new InvalidCredentialsException("Invalid refresh token");
+        }
+
+        String token = jwtService.generateToken(user.getId());
+        AuthResponse response = new AuthResponse();
+        response.setToken(token);
+        response.setRefreshToken(refreshToken);
+        return response;
+
     }
 }

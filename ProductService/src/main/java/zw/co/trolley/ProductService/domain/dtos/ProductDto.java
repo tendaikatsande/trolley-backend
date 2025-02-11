@@ -18,5 +18,7 @@ public class ProductDto {
     private Integer quantity;
     private String imageUrl;
     private Category category;
+    private Float rating;
+    private Float numRatings;
 
 }

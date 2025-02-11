@@ -21,6 +21,8 @@ public class Product {
     private BigDecimal price;
     private Integer quantity;
     private String imageUrl;
+    private Float rating;
+    private Float numRatings;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
