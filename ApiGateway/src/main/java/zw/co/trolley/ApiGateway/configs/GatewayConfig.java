@@ -30,17 +30,19 @@ public class GatewayConfig {
                 .route("user-service", r -> r
                         .path("/api/users/**")
                         .uri("http://localhost:8084"))
-
-                // Payment Service Routes
-                .route("payment-service", r -> r
-                        .path("/api/payments/**")
-                        .uri("http://localhost:8085"))
-
                 // Notification Service Routes
                 .route("notification-service", r -> r
                         .path("/api/notifications/**")
+                        .uri("http://localhost:8085"))
+                // Payment Service Routes
+                .route("payment-service", r -> r
+                        .path("/api/payments/**")
                         .uri("http://localhost:8086"))
 
+                // Swagger UI for API Gateway
+                .route("swagger-api-gateway", r -> r
+                        .path("/swagger-ui/api-gateway/**")
+                        .uri("http://localhost:8080/swagger-ui/index.html"))
 
                 // Swagger UI for Auth Service
                 .route("swagger-auth-service", r -> r
@@ -61,15 +63,14 @@ public class GatewayConfig {
                 .route("swagger-user-service", r -> r
                         .path("/swagger-ui/user/**")
                         .uri("http://localhost:8084/swagger-ui/index.html"))
+                // Swagger UI for Notification Service
+                .route("swagger-notification-service", r -> r
+                        .path("/swagger-ui/notification/**")
+                        .uri("http://localhost:8085/swagger-ui/index.html"))
 
                 // Swagger UI for Payment Service
                 .route("swagger-payment-service", r -> r
                         .path("/swagger-ui/payment/**")
-                        .uri("http://localhost:8085/swagger-ui/index.html"))
-
-                // Swagger UI for Notification Service
-                .route("swagger-notification-service", r -> r
-                        .path("/swagger-ui/notification/**")
                         .uri("http://localhost:8086/swagger-ui/index.html"))
 
 
@@ -92,15 +93,13 @@ public class GatewayConfig {
                 .route("openapi-user-service", r -> r
                         .path("/v3/api-docs/user/**")
                         .uri("http://localhost:8084/v3/api-docs"))
-
-                // Expose OpenAPI docs for Payment Service
-                .route("openapi-payment-service", r -> r
-                        .path("/v3/api-docs/payment/**")
-                        .uri("http://localhost:8085/v3/api-docs"))
-
                 // Expose OpenAPI docs for Notification Service
                 .route("openapi-notification-service", r -> r
                         .path("/v3/api-docs/notification/**")
+                        .uri("http://localhost:8085/v3/api-docs"))
+                // Expose OpenAPI docs for Payment Service
+                .route("openapi-payment-service", r -> r
+                        .path("/v3/api-docs/payment/**")
                         .uri("http://localhost:8086/v3/api-docs"))
                 .build();
     }
