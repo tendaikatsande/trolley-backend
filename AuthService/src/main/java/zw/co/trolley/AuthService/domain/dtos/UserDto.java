@@ -1,10 +1,15 @@
-package zw.co.trolley.UserService.domain.dtos;
+package zw.co.trolley.AuthService.domain.dtos;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Data
-public class UserProfileDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserDto {
     private String firstName;
     private String lastName;
     private String phone;

@@ -1,18 +1,21 @@
 package zw.co.trolley.AuthService.services;
 
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
-import zw.co.trolley.AuthService.domain.dtos.AuthRequest;
-import zw.co.trolley.AuthService.domain.dtos.AuthResponse;
-import zw.co.trolley.AuthService.domain.dtos.RegisterRequest;
+import zw.co.trolley.AuthService.configs.JwtService;
+import zw.co.trolley.AuthService.domain.dtos.*;
 import zw.co.trolley.AuthService.domain.models.User;
 import zw.co.trolley.AuthService.domain.repositories.UserRepository;
 import zw.co.trolley.AuthService.exceptions.InvalidCredentialsException;
 import zw.co.trolley.AuthService.exceptions.UserExistsException;
 import zw.co.trolley.AuthService.exceptions.UserNotFoundException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,8 +35,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
 
-        String token = jwtService.generateToken(savedUser.getId());
-        String refreshToken = jwtService.generateRefreshToken(savedUser.getId());
+        String token = jwtService.generateToken(savedUser.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(savedUser.getEmail());
 
         savedUser.setRefreshToken(refreshToken);
         userRepository.save(savedUser);
@@ -52,8 +55,8 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid password");
         }
 
-        String token = jwtService.generateToken(user.getId());
-        String refreshToken = jwtService.generateRefreshToken(user.getId());
+        String token = jwtService.generateToken(user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
@@ -77,11 +80,42 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid refresh token");
         }
 
-        String token = jwtService.generateToken(user.getId());
+        String token = jwtService.generateToken(user.getEmail());
         AuthResponse response = new AuthResponse();
         response.setToken(token);
         response.setRefreshToken(refreshToken);
         return response;
 
+    }
+
+    public UserDto getUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+
+            User user = userRepository.findByEmail(currentUserName)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+            List<AddressDto> addressDtoList = user.getAddresses().stream().map(address -> new AddressDto(
+                    null,
+                    address.getAddressLine1(),
+                    address.getAddressLine2(),
+                    address.getCity(),
+                    address.getState(),
+                    address.getPostalCode(),
+                    address.getCountry(),
+                    address.isDefault())
+            ).toList();
+
+            // Map User entity to UserDto
+            return new UserDto(
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getPhone(),
+                    user.getEmail(),
+                    addressDtoList
+            );
+        }
+        throw new UserNotFoundException("User not found");
     }
 }

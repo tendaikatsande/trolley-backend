@@ -1,12 +1,14 @@
-package zw.co.trolley.UserService.domain.dtos;
+package zw.co.trolley.AuthService.domain.dtos;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import zw.co.trolley.UserService.domain.models.UserProfile;
+import zw.co.trolley.AuthService.domain.models.User;
 
 @Data
+@AllArgsConstructor
 public class AddressDto {
-    private UserProfile userProfile;
+    private User user;
     private String addressLine1;
     private String addressLine2;
     private String city;

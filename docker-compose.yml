@@ -37,12 +37,7 @@ services:
       - order-db
       - rabbitmq
 
-  user-service:
-    build: ./UserService
-    ports:
-      - "8084:8084"
-    depends_on:
-      - user-db
+
 
   notification-service:
     build: ./NotificationService
@@ -85,12 +80,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
 
-  user-db:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: tr_user_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
+
 
   payment-db:
     image: postgres:latest

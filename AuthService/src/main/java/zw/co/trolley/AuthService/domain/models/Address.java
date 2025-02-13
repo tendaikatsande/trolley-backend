@@ -1,7 +1,6 @@
-package zw.co.trolley.UserService.domain.models;
+package zw.co.trolley.AuthService.domain.models;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,8 +16,8 @@ public class Address {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "user_profile_id")
-    private UserProfile userProfile;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String addressLine1;
     private String addressLine2;

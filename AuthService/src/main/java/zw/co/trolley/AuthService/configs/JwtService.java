@@ -1,33 +1,45 @@
-package zw.co.trolley.AuthService.services;
-
+package zw.co.trolley.AuthService.configs;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
+import java.util.Base64;
 
 @Service
 public class JwtService {
-    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+
+    @Value("${jwt.secret}")
+    private String secret; // Store the secret as a String
+
+    private Key SECRET_KEY; // The actual Key object
+
     private static final long ACCESS_TOKEN_EXPIRATION = 24 * 60 * 60 * 1000; // 24 hours
     private static final long REFRESH_TOKEN_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-    public String generateToken(UUID userId) {
+    @PostConstruct // Initialize SECRET_KEY after the bean is created and secret is injected
+    public void init() {
+        byte[] decodedKey = Base64.getDecoder().decode(secret);
+        this.SECRET_KEY = Keys.hmacShaKeyFor(decodedKey);
+    }
+
+    public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(userId.toString())
+                .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(SECRET_KEY)
                 .compact();
     }
 
-    public String generateRefreshToken(UUID userId) {
+    public String generateRefreshToken(String username) {
         return Jwts.builder()
-                .setSubject(userId.toString())
+                .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
                 .signWith(SECRET_KEY)
@@ -77,5 +89,14 @@ public class JwtService {
                 .parseClaimsJws(refreshToken)
                 .getBody();
         return claims.getSubject();
+    }
+
+    public String extractUsername(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

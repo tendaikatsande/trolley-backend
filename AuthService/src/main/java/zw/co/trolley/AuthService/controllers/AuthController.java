@@ -26,8 +26,8 @@ public class AuthController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<String> profile() {
-        return ResponseEntity.ok("Profile");
+    public ResponseEntity<?> profile() {
+        return ResponseEntity.ok(authService.getUserProfile());
     }
     @GetMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(@RequestHeader("Authorization") String refreshToken) {
