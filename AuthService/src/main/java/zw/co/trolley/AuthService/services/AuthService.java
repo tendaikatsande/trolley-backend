@@ -31,6 +31,9 @@ public class AuthService {
         }
 
         User user = new User();
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         User savedUser = userRepository.save(user);
@@ -97,6 +100,7 @@ public class AuthService {
                     .orElseThrow(() -> new UserNotFoundException("User not found"));
 
             List<AddressDto> addressDtoList = user.getAddresses().stream().map(address -> new AddressDto(
+                    address.getId(),
                     null,
                     address.getAddressLine1(),
                     address.getAddressLine2(),
@@ -109,6 +113,7 @@ public class AuthService {
 
             // Map User entity to UserDto
             return new UserDto(
+                    user.getUserId(),
                     user.getFirstName(),
                     user.getLastName(),
                     user.getPhone(),

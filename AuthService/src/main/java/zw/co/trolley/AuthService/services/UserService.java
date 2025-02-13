@@ -1,6 +1,9 @@
 package zw.co.trolley.AuthService.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,7 +13,9 @@ import zw.co.trolley.AuthService.domain.dtos.UserDto;
 import zw.co.trolley.AuthService.domain.dtos.UserInfoDetails;
 import zw.co.trolley.AuthService.domain.models.Address;
 import zw.co.trolley.AuthService.domain.models.User;
+import zw.co.trolley.AuthService.domain.repositories.AddressRepository;
 import zw.co.trolley.AuthService.domain.repositories.UserRepository;
+import zw.co.trolley.AuthService.exceptions.UserNotFoundException;
 import zw.co.trolley.AuthService.exceptions.UserProfileNotFoundException;
 
 
@@ -22,6 +27,7 @@ import java.util.UUID;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
 
     public UserDto createUserProfile(UserDto userDto) {
         User user = new User();
@@ -33,41 +39,44 @@ public class UserService implements UserDetailsService {
         return new UserDto();
     }
 
-    public UserDto getUserProfile(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserProfileNotFoundException("User profile not found for userId: " + userId));
-        UserDto profileDto = new UserDto();
-        profileDto.setFirstName(user.getFirstName());
-        profileDto.setLastName(user.getLastName());
-        profileDto.setPhone(user.getPhone());
-        profileDto.setEmail(user.getEmail());
-        return profileDto;
 
+    public UserDto updateProfile(UserDto profileDto) {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            User user = userRepository.findByEmail(currentUserName)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+            user.setFirstName(profileDto.getFirstName());
+            user.setLastName(profileDto.getLastName());
+            user.setPhone(profileDto.getPhone());
+            user.setEmail(profileDto.getEmail());
+            userRepository.save(user);
+            return profileDto;
+        }
+        throw new UserNotFoundException("User not found");
     }
 
-    public UserDto updateProfile(UUID userId, UserDto profileDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserProfileNotFoundException("User profile not found for userId: " + userId));
-        user.setFirstName(profileDto.getFirstName());
-        user.setLastName(profileDto.getLastName());
-        user.setPhone(profileDto.getPhone());
-        user.setEmail(profileDto.getEmail());
-        userRepository.save(user);
-        return profileDto;
-    }
-
-    public AddressDto addAddress(UUID userId, AddressDto addressDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserProfileNotFoundException("User profile not found for userId: " + userId));
-        Address address = new Address();
-        address.setAddressLine1(addressDto.getAddressLine1());
-        address.setAddressLine2(addressDto.getAddressLine2());
-        address.setCity(addressDto.getCity());
-        address.setState(addressDto.getState());
-        address.setPostalCode(addressDto.getPostalCode());
-        address.setCountry(addressDto.getCountry());
-        address.setDefault(addressDto.isDefault());
-        address.setUser(user);
-        user.getAddresses().add(address);
-        userRepository.save(user);
-        return addressDto;
+    public AddressDto addAddress(AddressDto addressDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            User user = userRepository.findByEmail(currentUserName)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+            Address address = new Address();
+            address.setAddressLine1(addressDto.getAddressLine1());
+            address.setAddressLine2(addressDto.getAddressLine2());
+            address.setCity(addressDto.getCity());
+            address.setState(addressDto.getState());
+            address.setPostalCode(addressDto.getPostalCode());
+            address.setCountry(addressDto.getCountry());
+            address.setDefault(addressDto.isDefault());
+            address.setUser(user);
+            user.getAddresses().add(address);
+            userRepository.save(user);
+            return addressDto;
+        }
+        throw new UserNotFoundException("User not found");
     }
 
     @Override
@@ -77,5 +86,23 @@ public class UserService implements UserDetailsService {
         // Converting UserInfo to UserDetails
         return userDetail.map(UserInfoDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
+
+    public AddressDto updateAddress(UUID id, AddressDto addressDto) {
+        Address address = addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address does not exist"));
+        address.setId(id);
+        address.setAddressLine1(addressDto.getAddressLine1());
+        address.setAddressLine2(addressDto.getAddressLine2());
+        address.setCity(addressDto.getCity());
+        address.setState(addressDto.getState());
+        address.setPostalCode(addressDto.getPostalCode());
+        address.setCountry(addressDto.getCountry());
+        address.setDefault(addressDto.isDefault());
+        addressRepository.save(address);
+        return addressDto;
+    }
+
+    public void deleteAddress(UUID id) {
+        addressRepository.deleteById(id);
     }
 }
