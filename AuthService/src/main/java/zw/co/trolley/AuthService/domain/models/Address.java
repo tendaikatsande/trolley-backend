@@ -14,11 +14,9 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
     private String addressLine1;
     private String addressLine2;
     private String city;

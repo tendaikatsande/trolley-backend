@@ -28,4 +28,18 @@ public class Order {
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private ShippingAddress shippingAddress;
+
+    private String paymentMethod;
+
+    private String paymentStatus;
+
+    private String paymentReference;
+
+    private String pollUrl;
+
+    private String redirectUrl;
+
+    private LocalDateTime paymentDate;
+
+
 }

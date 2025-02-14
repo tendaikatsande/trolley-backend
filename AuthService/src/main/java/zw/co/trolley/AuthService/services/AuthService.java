@@ -113,7 +113,7 @@ public class AuthService {
 
             // Map User entity to UserDto
             return new UserDto(
-                    user.getUserId(),
+                    user.getId(),
                     user.getFirstName(),
                     user.getLastName(),
                     user.getPhone(),
